@@ -111,7 +111,8 @@ class Config(object):
     _config_path = None
 
     def __init__(self):
-        self._config_path = os.environ.get('NASTOOL_CONFIG')
+        # self._config_path = os.environ.get('NASTOOL_CONFIG')
+        self._config_path ="D:/git/nas-tools-snap/config/config.yaml"
         if not os.environ.get('TZ'):
             os.environ['TZ'] = 'Asia/Shanghai'
         self.init_syspath()

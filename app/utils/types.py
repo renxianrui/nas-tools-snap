@@ -62,6 +62,7 @@ class IndexerType(Enum):
     JACKETT = "Jackett"
     PROWLARR = "Prowlarr"
     BUILTIN = "Indexer"
+    ALIST = "alist"
 
 
 class MediaServerType(Enum):

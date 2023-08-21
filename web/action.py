@@ -259,7 +259,7 @@ class WebAction:
             os.kill(os.getpid(), getattr(signal, "SIGKILL", signal.SIGTERM))
         elif SystemUtils.is_synology():
             os.system(
-                "ps -ef | grep -v grep | grep 'python run.py'|awk '{print $2}'|xargs kill -9")
+                "ps -ef | grep -v grep | grep 'python webdav.py'|awk '{print $2}'|xargs kill -9")
         else:
             os.system("pm2 restart NAStool")
 

@@ -1,6 +1,7 @@
 import log
 from app.helper import DbHelper
 from app.indexer import Indexer
+from app.indexer.client.alist import Alist
 from config import Config
 from app.message import Message
 from app.downloader import Downloader
@@ -16,6 +17,7 @@ class Searcher:
     indexer = None
     progress = None
     dbhelper = None
+    alist=Alist()
 
     _search_auto = True
 
@@ -48,10 +50,36 @@ class Searcher:
             return []
         if not self.indexer:
             return []
+
         return self.indexer.search_by_keyword(key_word=key_word,
                                               filter_args=filter_args,
                                               match_media=match_media,
                                               in_from=in_from)
+
+    def search_medias_alist(self,
+                      key_word: [str, list],
+                      filter_args: dict,
+                      match_media=None,
+                      in_from: SearchType = None):
+        """
+        根据关键字调用索引器检查媒体
+        :param key_word: 检索的关键字，不能为空
+        :param filter_args: 过滤条件
+        :param match_media: 区配的媒体信息
+        :param in_from: 搜索渠道
+        :return: 命中的资源媒体信息列表
+        """
+        if not key_word:
+            return []
+        if not self.indexer:
+            return []
+
+        result=self.alist.search_by_keyword(key_word=key_word,
+                                              filter_args=filter_args,
+                                              match_media=match_media,
+                                              in_from=in_from)
+        return result
+
 
     def search_one_media(self, media_info,
                          in_from: SearchType,

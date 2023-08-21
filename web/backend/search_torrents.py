@@ -128,6 +128,22 @@ def search_medias_for_web(content, ident_flag=True, filters=None, tmdbid=None, m
     # 整合高级查询条件
     if filters:
         filter_args.update(filters)
+
+    log.info("【Web】开始检索Alist %s ..." % content)
+    media_list_alist=Searcher().search_medias_alist(key_word=first_search_name,
+                                          filter_args=filter_args,
+                                          match_media=media_info,
+                                          in_from=SearchType.WEB)
+    if (ident_flag
+            and len(media_list_alist) == 0 \
+            and second_search_name \
+            and second_search_name != first_search_name):
+        log.info("【Searcher】%s 未检索到资源,尝试通过 %s 重新检索 ..." % (first_search_name, second_search_name))
+        media_list_alist = Searcher().search_medias_alist(key_word=second_search_name,
+                                          filter_args=filter_args,
+                                          match_media=media_info,
+                                          in_from=SearchType.WEB)
+
     # 开始检索
     log.info("【Web】开始检索 %s ..." % content)
     media_list = Searcher().search_medias(key_word=first_search_name,
@@ -135,10 +151,10 @@ def search_medias_for_web(content, ident_flag=True, filters=None, tmdbid=None, m
                                           match_media=media_info,
                                           in_from=SearchType.WEB)
     # 使用第二名称重新搜索
-    if ident_flag \
-            and len(media_list) == 0 \
+    if (ident_flag
+             # and len(media_list) == 0 \
             and second_search_name \
-            and second_search_name != first_search_name:
+            and second_search_name != first_search_name):
         search_process.start('search')
         search_process.update(ptype='search',
                               text="%s 未检索到资源,尝试通过 %s 重新检索 ..." % (first_search_name, second_search_name))
@@ -147,6 +163,9 @@ def search_medias_for_web(content, ident_flag=True, filters=None, tmdbid=None, m
                                               filter_args=filter_args,
                                               match_media=media_info,
                                               in_from=SearchType.WEB)
+
+    #合并alist搜索结果
+    media_list+=media_list_alist
     # 清空缓存结果
     dbhepler = DbHelper()
     dbhepler.delete_all_search_torrents()

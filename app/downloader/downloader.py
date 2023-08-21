@@ -133,6 +133,10 @@ class Downloader:
         :param torrent_file: 种子文件路径
         :return: 种子或状态，错误信息
         """
+        if(media_info.site=="Alist"):
+            return self.downloadAlist(media_info=media_info,
+                                                 download_dir=download_dir,
+                                                 download_setting=download_setting)
         # 标题
         title = media_info.org_string
         # 详情页面
@@ -313,6 +317,111 @@ class Downloader:
             ExceptionUtils.exception_traceback(e)
             log.error("【Downloader】添加下载任务出错：%s" % str(e))
             return None, str(e)
+
+
+    def downloadAlist(self,
+                 media_info,
+                 is_paused=None,
+                 tag=None,
+                 download_dir=None,
+                 download_setting=None,
+                 torrent_file=None):
+        """
+        添加下载任务，下载alist资源，使用aria2
+        :param media_info: 需下载的媒体信息，含URL地址
+        :param is_paused: 是否暂停下载
+        :param tag: 种子标签
+        :param download_dir: 指定下载目录
+        :param download_setting: 下载设置id
+        :param torrent_file: 种子文件路径
+        :return: 种子或状态，错误信息
+        """
+        # 标题
+        title = media_info.org_string
+        #下载链接
+        url = media_info.enclosure
+
+        # 下载设置
+
+        if not download_setting and media_info.site:
+            download_setting = self.sites.get_site_download_setting(media_info.site)
+        if download_setting:
+            download_attr = self.get_download_setting(download_setting) \
+                            or self.get_download_setting(self.get_default_download_setting())
+        else:
+            download_attr = self.get_download_setting(self.get_default_download_setting())
+        # 下载器类型
+        dl_type = self.__get_client_type(DownloaderType.Aria2.name)
+        # 下载器客户端
+        downloader = self.__get_client(dl_type)
+
+        # 开始添加下载
+        try:
+            # 分类
+            category = download_attr.get("category")
+            # 合并TAG
+            tags = download_attr.get("tags")
+            if tags:
+                tags = tags.split(";")
+                if tag:
+                    tags.append(tag)
+            else:
+                if tag:
+                    tags = [tag]
+            # 布局
+            content_layout = download_attr.get("content_layout")
+            if content_layout == 1:
+                content_layout = "Original"
+            elif content_layout == 2:
+                content_layout = "Subfolder"
+            elif content_layout == 3:
+                content_layout = "NoSubfolder"
+            else:
+                content_layout = ""
+            # 暂停
+            if is_paused is None:
+                is_paused = StringUtils.to_bool(download_attr.get("is_paused"))
+            else:
+                is_paused = True if is_paused else False
+            # 上传限速
+            upload_limit = download_attr.get("upload_limit")
+            # 下载限速
+            download_limit = download_attr.get("download_limit")
+            # 分享率
+            ratio_limit = download_attr.get("ratio_limit")
+            # 做种时间
+            seeding_time_limit = download_attr.get("seeding_time_limit")
+            # 下载目录
+            if not download_dir:
+                download_info = self.__get_download_dir_info(media_info)
+                download_dir = download_info.get('path')
+                download_label = download_info.get('label')
+                if not category:
+                    category = download_label
+            # 添加下载
+            if is_paused:
+                log.info("【Downloader】添加下载任务并暂停：%s，目录：%s，Url：%s" % (title, download_dir, url))
+            else:
+                log.info("【Downloader】添加下载任务：%s，目录：%s，Url：%s" % (title, download_dir, url))
+
+            ret = downloader.add_torrent(url,
+                                             is_paused=is_paused,
+                                             tag=tags,
+                                             download_dir=download_dir,
+                                             category=category)
+            # 添加下载成功
+            if ret:
+                # 登记下载历史
+                self.dbhelper.insert_download_history(media_info)
+
+                return ret, ""
+            else:
+                return ret, "请检查下载任务是否已存在"
+        except Exception as e:
+            ExceptionUtils.exception_traceback(e)
+            log.error("【Downloader】添加下载任务出错：%s" % str(e))
+            return None, str(e)
+
 
     def transfer(self):
         """
