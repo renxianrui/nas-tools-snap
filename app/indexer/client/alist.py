@@ -43,6 +43,10 @@ class Alist():
         self.filter = Filter()
         self.progress = ProgressHelper()
 
+    @classmethod
+    def match(cls, ctype):
+        return True if ctype in [cls.schema, cls.index_type] else False
+
     def search_by_keyword(self,
                key_word,
                filter_args: dict,
