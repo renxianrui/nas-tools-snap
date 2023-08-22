@@ -389,6 +389,45 @@ class ModuleConf(object):
                     }
                 }
             },
+            "mail": {
+                "name": "邮件",
+                "img_url": "../static/img/synologychat.png",
+                "config": {
+                "mail_server": {
+                        "id": "mail_server",
+                        "required": True,
+                        "title": "服务器地址",
+                        "tooltip": "smtp.163.com",
+                        "type": "text",
+                        "placeholder": ""
+                    },
+                    "mail_pass": {
+                        "id": "mail_pass",
+                        "required": True,
+                        "title": "授权码",
+                        "tooltip": "",
+                        "type": "text",
+                        "placeholder": ""
+                    },
+                    "mail_sender": {
+                        "id": "mail_sender",
+                        "required": True,
+                        "title": "发件人",
+                        "tooltip": "",
+                        "type": "text",
+                        "placeholder": ""
+                    },
+
+                    "mail_receiver": {
+                        "id": "mail_receiver",
+                        "required": True,
+                        "title": "收件人",
+                        "tooltip": "收件人邮箱,多个用逗号分隔",
+                        "type": "text",
+                        "placeholder": ""
+                    }
+                }
+            },
         },
         "switch": {
             "download_start": {
