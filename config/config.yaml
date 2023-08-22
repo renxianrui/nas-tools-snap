@@ -221,6 +221,12 @@ pt:
   # 【搜索结果数量限制】：每个站点返回搜索结果的最大数量
   site_search_result_num: 100
 
+# 【配置alist】
+alist:
+  host: http://192.168.31.186:5678
+  # 是否启用
+  enabled: FALSE
+
 # 【配置Jackett检索器】
 jackett:
   # 【Jackett地址】：Jackett地址和端口，格式：http(s)://IP:PORT
@@ -283,9 +289,12 @@ pikpak:
   proxy:
 
 # 【下载目录】：配置下载目录，自按分类下载到指定目录
-downloaddir: []
-
-# 【配置豆瓣账号信息】：配置后会自动同步豆瓣收藏，豆瓣标记想看内容后，后台自动下载
+downloaddir:
+- save_path: /data/nas/downloads/电视剧
+  type: 电视剧
+  category: ''
+  container_path: ''
+  label: ''
 douban:
   # 【用户ID列表】：豆瓣电影点个我主页people后面的那一串数字，或者使用豆瓣App个人信息中查看。可以配置多个，注意要加引号
   # 这里可以是自己的，也可以是别人的，比如填写几个大V的账号ID，实现热门影视自动下载

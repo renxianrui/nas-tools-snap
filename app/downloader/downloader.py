@@ -501,7 +501,12 @@ class Downloader:
             tag = [PT_TAG]
         else:
             tag = None
-        return self.default_client.get_downloading_progress(tag=tag)
+        # 获取aria2的结果
+        # aria2_result=self.__get_client(DownloaderType.Aria2).get_downloading_progress(tag=tag)
+
+        # 默认下载器的结果
+        default_result=self.default_client.get_downloading_progress(tag=tag)
+        return default_result
 
     def get_torrents(self, torrent_ids):
         """

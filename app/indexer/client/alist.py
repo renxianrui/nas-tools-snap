@@ -7,13 +7,14 @@ import requests
 
 from app.filter import Filter
 from app.helper import IndexerConf, ProgressHelper
-from app.indexer.client._base import _IIndexClient
 from app.media import Media
 from app.media.meta import MetaInfo
 from app.utils import StringUtils
 from app.utils.types import IndexerType, SearchType, MediaType
 import log
 import datetime
+
+from config import Config
 
 
 class Alist():
@@ -26,7 +27,7 @@ class Alist():
     _indexer=IndexerConf(datas={
         'id':'alsit',
         'name':'Alist',
-        'domain':'http://192.168.31.186:5678',
+        'domain': Config().get_config("alist").get('host'),
 
     },public=True,pri=100)
 
@@ -116,8 +117,9 @@ class Alist():
         result = response.read().decode('utf-8')
         print(result)
         matchs = re.findall('<a\s+href=(/[^>]+)>', result)
-        for match in matchs:
-            result_url+=self.get_list(match)
+        if(matchs):
+            for match in matchs:
+                result_url+=self.get_list(match)
         return result_url
 
 
@@ -130,7 +132,7 @@ class Alist():
         while True:
             req_type, req_json = self.post(url=url, data=data)
             if req_type is False:
-                return
+                return result_url
             elif req_json.get("code") == 200:
                 break
             elif error_number > 2:
@@ -140,10 +142,10 @@ class Alist():
                 error_number += 1
                 time.sleep(2)
         if req_json.get("data") is None:
-            return
+            return result_url
         content = req_json.get("data")["content"]
         if content is None:
-            return
+            return result_url
         for file_info in content:
             if file_info["is_dir"] is True:
                 file_download_url = path + "/" + file_info["name"]
